@@ -20,6 +20,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+from settings import MAIN_GROUP
 
 from cement_core import Structure, detect_groups, element_of  # noqa: E402
 
