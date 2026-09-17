@@ -1,0 +1,252 @@
+# Bulk C-S-H at Ca/Si = 0.667: anomalous 11 A tobermorite, CELL_OPT.
+#
+# Structure : COD 9005498 (CC0) - Merlino, Bonaccorsi & Armbruster,
+#             Eur. J. Mineral. 13, 577-590 (2001). B11m, 6.735 x 7.385 x
+#             22.487 A, gamma 123.25. Expanded by symmetry, hydrogens added
+#             (the refinement locates none), 2 x 2 x 1 supercell.
+# Composition: Ca32 Si48 O176 H96 = 8 x Ca4Si6O15(OH)2.5H2O, neutral,
+#             Ca/Si = 0.6667. Groups: 40 H2O, 16 OH, 48 SiO4.
+# Cell      : 11.2648 x 14.770 x 22.487, all 90 deg. The monoclinic B11m
+#             setting is transformed to the orthogonal supercell
+#             A'=2a+b, B'=2b, C'=c, as Churakov did (11.265 x 14.792 x
+#             22.487). This puts the silicate chains along +y instead of
+#             diagonal, which is what makes them easy to constrain and cut.
+#
+# Numerical settings follow the existing C-S-H CELL_OPT runs in this group
+# (cutoff 800/80, EPS_SCF 1E-7, LBFGS, DIRECT_CELL_OPT, KEEP_ANGLES).
+
+#################################################
+#############PARAMETER SECTION###################
+#################################################
+
+#@SET run_type  ENERGY
+#@SET run_type GEO_OPT
+@SET run_type CELL_OPT
+#@SET run_type MD
+
+# Keep below the scheduler --time limit so CP2K stops cleanly with a restart.
+@SET walltime 41000
+
+@SET mineral   CSH-11A-anom
+@SET surface   bulk
+#@SET project   ${mineral}-${surface}
+@IF ${surface}==bulk
+ @SET project   ${mineral}
+@ENDIF
+
+@SET coord_ini CSH_11A_anomalous_ortho.xyz
+
+#@SET restart yes
+@SET restart no
+
+@SET PBC YES
+@SET a  11.2648000000
+@SET b  14.7700000000
+@SET c  22.4870000000
+@SET alpha  90.0
+@SET beta   90.0
+@SET gamma  90.0
+@IF ${PBC}==YES
+ @SET na 1
+ @SET nb 1
+ @SET nc 1
+@ENDIF
+
+@SET xcf       PBE
+@SET PF             2
+@SET PFL            20
+# Cell optimization needs a higher cutoff than a fixed-cell run: the basis
+# follows the atoms while the grid follows the cell, so an incomplete basis
+# shows up as Pulay stress and shifts the converged volume.
+@SET cutoff       800
+@SET rel_cutoff   80
+@SET dispersion DFTD3
+@IF ${dispersion}/=NONE
+ @SET disp_r_cutoff 30
+@ENDIF
+
+#################################################
+#######END OF THE PARAMETER SECTION##############
+#################################################
+
+@IF ${restart}==yes
+ &EXT_RESTART
+  RESTART_FILE_NAME ${project}-1.restart
+ &END EXT_RESTART
+@ENDIF
+
+&GLOBAL
+ PRINT_LEVEL LOW
+ PROJECT ${project}
+ RUN_TYPE ${run_type}
+ WALLTIME ${walltime}
+ PREFERRED_DIAG_LIBRARY SL
+ &FM
+  TYPE_OF_MATRIX_MULTIPLICATION SCALAPACK
+ &END FM
+ FLUSH_SHOULD_FLUSH  T
+&END GLOBAL
+
+&MOTION
+ &CELL_OPT
+  # Hold the cell orthorhombic; without this it can drift to triclinic and
+  # the chain alignment that motivated the transformation is lost.
+  KEEP_ANGLES T
+  OPTIMIZER LBFGS
+  MAX_ITER 1000
+  TYPE DIRECT_CELL_OPT
+#  EXTERNAL_PRESSURE [bar] 1.0
+#  PRESSURE_TOLERANCE [bar] 100.0
+ &END CELL_OPT
+ &GEO_OPT
+  OPTIMIZER LBFGS
+  MAX_ITER 1000
+ &END GEO_OPT
+ &PRINT
+  &CELL
+   &EACH
+    CELL_OPT 1
+   &END EACH
+  &END CELL
+  &RESTART
+   ADD_LAST NUMERIC
+   BACKUP_COPIES 1
+   &EACH
+    CELL_OPT ${PF}
+   &END EACH
+  &END RESTART
+  &RESTART_HISTORY on
+   &EACH
+    CELL_OPT 100
+   &END EACH
+  &END RESTART_HISTORY
+  &TRAJECTORY on
+   FORMAT xyz
+   &EACH
+    CELL_OPT 1
+   &END EACH
+  &END TRAJECTORY
+ &END PRINT
+&END MOTION
+
+&FORCE_EVAL
+ METHOD QS
+ # Required for CELL_OPT - without a stress tensor there is nothing to optimize.
+ STRESS_TENSOR ANALYTICAL
+ &DFT
+  BASIS_SET_FILE_NAME BASIS_SET_MOLOPT
+  POTENTIAL_FILE_NAME POTENTIAL_SERG
+  # Closed shell: Ca(2+), Si(4+), O(2-), H(+), no transition metals, no
+  # unpaired electrons. Neutral by construction - 24 H per primitive cell
+  # balance Ca8Si12O44 exactly.
+  CHARGE 0
+@IF ${restart}==yes
+  WFN_RESTART_FILE_NAME ${project}-RESTART.wfn
+@ENDIF
+  &MGRID
+   COMMENSURATE
+   CUTOFF ${cutoff}
+   REL_CUTOFF ${rel_cutoff}
+   NGRIDS 5
+  &END MGRID
+  &QS
+   EPS_DEFAULT 1.0E-12
+   EXTRAPOLATION ASPC
+   EXTRAPOLATION_ORDER 3
+   METHOD GPW
+  &END QS
+  &SCF
+   EPS_SCF 5.0E-6
+   MAX_SCF 64
+   @IF ${restart}==yes
+    SCF_GUESS RESTART
+   @ENDIF
+   @IF ${restart}==no
+    SCF_GUESS ATOMIC
+   @ENDIF
+   &OT on
+    MINIMIZER CG
+    PRECONDITIONER FULL_SINGLE_INVERSE
+   &END OT
+   &OUTER_SCF on
+    EPS_SCF 5.0E-6
+    MAX_SCF 20
+   &END OUTER_SCF
+   &PRINT
+    &RESTART
+     ADD_LAST NUMERIC
+     BACKUP_COPIES 0
+     &EACH
+      QS_SCF 10
+     &END EACH
+    &END RESTART
+   &END PRINT
+  &END SCF
+  &XC
+   &XC_FUNCTIONAL ${xcf}
+   &END XC_FUNCTIONAL
+   &VDW_POTENTIAL
+    DISPERSION_FUNCTIONAL PAIR_POTENTIAL
+    &PAIR_POTENTIAL
+     R_CUTOFF ${disp_r_cutoff}
+     TYPE DFTD3
+     PARAMETER_FILE_NAME  dftd3.dat
+     REFERENCE_FUNCTIONAL ${xcf}
+    &END PAIR_POTENTIAL
+   &END VDW_POTENTIAL
+  &END XC
+  &PRINT
+   &DFT_CONTROL_PARAMETERS on
+   &END DFT_CONTROL_PARAMETERS
+  &END PRINT
+ &END DFT
+ &PRINT
+  &TOTAL_NUMBERS ON
+  &END TOTAL_NUMBERS
+  &STRESS_TENSOR
+   &EACH
+    CELL_OPT ${PF}
+   &END EACH
+  &END STRESS_TENSOR
+ &END PRINT
+ &SUBSYS
+  &CELL
+   ABC ${a} ${b} ${c}
+   ALPHA_BETA_GAMMA ${alpha} ${beta} ${gamma}
+   MULTIPLE_UNIT_CELL ${na} ${nb} ${nc}
+  &END CELL
+  &KIND H
+   BASIS_SET DZVP-MOLOPT-SR-GTH
+   POTENTIAL GTH-PBE-q1
+  &END KIND
+  &KIND O
+   BASIS_SET DZVP-MOLOPT-SR-GTH
+   POTENTIAL GTH-PBE-q6
+  &END KIND
+  &KIND Si
+   BASIS_SET DZVP-MOLOPT-SR-GTH
+   POTENTIAL GTH-PBE-q4
+  &END KIND
+  &KIND Ca
+   BASIS_SET DZVP-MOLOPT-SR-GTH
+   POTENTIAL GTH-PBE-q10
+  &END KIND
+  &PRINT
+   &ATOMIC_COORDINATES on
+   &END ATOMIC_COORDINATES
+   &CELL on
+   &END CELL
+   &KINDS on
+    BASIS_SET
+    POTENTIAL
+   &END KINDS
+  &END PRINT
+  &TOPOLOGY
+   MULTIPLE_UNIT_CELL ${na} ${nb} ${nc}
+   @IF ${restart}==no
+    COORD_FILE_FORMAT XYZ
+    COORD_FILE_NAME ${coord_ini}
+   @ENDIF
+  &END TOPOLOGY
+ &END SUBSYS
+&END FORCE_EVAL

@@ -1,0 +1,107 @@
+#------------------------------------------------------------------------------
+#$Date: 2023-05-18 15:51:33 +0300 (Thu, 18 May 2023) $
+#$Revision: 283866 $
+#$URL: file:///home/coder/svn-repositories/_RELOADED_COD/cod-reloaded/cif/9/00/54/9005499.cif $
+#------------------------------------------------------------------------------
+#
+# This file is available in the Crystallography Open Database (COD),
+# http://www.crystallography.net/. The original data for this entry
+# were provided the American Mineralogist Crystal Structure Database,
+# http://rruff.geo.arizona.edu/AMS/amcsd.php
+#
+# The file may be used within the scientific community so long as
+# proper attribution is given to the journal article from which the
+# data were obtained.
+#
+data_9005499
+loop_
+_publ_author_name
+'Merlino, S.'
+'Bonaccorsi, E.'
+'Armbruster, T.'
+_publ_section_title
+;
+ The real structure of tobermorite 11\%A: normal and anomalous forms,
+ OD character and polytypic modifications
+ Note: sample MDO2
+;
+_journal_name_full               'European Journal of Mineralogy'
+_journal_page_first              577
+_journal_page_last               590
+_journal_paper_doi               10.1127/0935-1221/2001/0013-0577
+_journal_volume                  13
+_journal_year                    2001
+_chemical_compound_source        'Locality: Ba\<scenov, Urals, Russia'
+_chemical_formula_sum            'Ca2.25 H7 O11 Si3'
+_chemical_name_mineral           Tobermorite
+_space_group_IT_number           8
+_symmetry_space_group_name_Hall  'B -2'
+_symmetry_space_group_name_H-M   'B 1 1 m'
+_cell_angle_alpha                90
+_cell_angle_beta                 90
+_cell_angle_gamma                123.18(1)
+_cell_formula_units_Z            4
+_cell_length_a                   6.732(2)
+_cell_length_b                   7.369(1)
+_cell_length_c                   22.680(4)
+_cell_volume                     941.668
+_database_code_amcsd             0006886
+_diffrn_radiation_probe          x-ray
+_diffrn_source                   'conventional X-ray source'
+_exptl_crystal_density_diffrn    2.522
+_refine_ls_R_factor_gt           0.089
+_cod_original_formula_sum        'Ca2.25 Si3 O11 H7'
+_cod_database_code               9005499
+loop_
+_space_group_symop_operation_xyz
+x,y,z
+1/2+x,y,1/2+z
+x,y,-z
+1/2+x,y,1/2-z
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+_atom_site_U_iso_or_equiv
+_atom_site_type_symbol
+_atom_site_attached_hydrogens
+Ca1 0.26320 0.43100 0.20690 1.00000 0.01100 Ca 0
+Ca2 0.55900 0.07800 0.04400 0.25000 0.03500 Ca 0
+Ca3 0.75190 0.92280 0.29450 1.00000 0.00900 Ca 0
+Si1 0.75700 0.38760 0.15740 1.00000 0.00700 Si 0
+Si2 0.91500 0.75600 0.07100 1.00000 0.01500 Si 0
+Si3 0.75800 0.96700 0.15890 1.00000 0.00700 Si 0
+O1 0.75400 0.49900 0.09490 1.00000 0.01800 O 0
+O2 0.77200 0.18500 0.13280 1.00000 0.01400 O 0
+O3 0.99200 0.53700 0.19710 1.00000 0.01100 O 0
+O4 0.52300 0.31200 0.19460 1.00000 0.01500 O 0
+O5 0.89800 0.75200 0.00000 1.00000 0.01700 O 0
+O6 0.19700 0.89600 0.09490 1.00000 0.01800 O 0
+Wat6 0.23700 0.41600 0.09700 1.00000 0.09000 O 2
+O7 0.75200 0.85300 0.09720 1.00000 0.01700 O 0
+O8 0.52400 0.80700 0.19620 1.00000 0.00800 O 0
+O9 0.98400 0.04500 0.20020 1.00000 0.01100 O 0
+Wat1 0.42000 0.26000 -0.02000 0.50000 0.13000 O 2
+Wat2 0.92200 0.25000 0.00000 1.00000 0.07000 O 2
+Wat3 0.40000 0.76000 -0.01900 0.50000 0.10000 O 2
+loop_
+_cod_changelog_entry_id
+_cod_changelog_entry_author
+_cod_changelog_entry_date
+_cod_changelog_entry_text
+1
+;cod-tools version 3.8.0
+Id: cif_guess_AMCSD_atom_types 9581 2023-05-17 12:35:41Z saulius
+;
+2023-05-18T11:39:21+03:00
+;Derived atom types and hydrogen counts
+from atom names that follow the AMCSD naming convention
+(Wat == water, O-H == hydroxyl).
+;
+loop_
+_cod_related_entry_id
+_cod_related_entry_database
+_cod_related_entry_code
+1 AMCSD 0006886
